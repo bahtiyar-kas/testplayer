@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlayerJS VAST repro — RU НОВЫЙ id:vast12219 (НЕ работает)</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:#0f1115; color:#e8e8e8; }
+    .wrap { max-width:900px; margin:0 auto; padding:20px 16px 50px; }
+    h1 { font-size:18px; margin:0 0 4px; }
+    .badge { display:inline-block; font-size:12px; padding:3px 9px; border-radius:999px; background:#7c2d12; color:#fdba74; margin-bottom:12px; }
+    .info { background:#161a21; border:1px solid #242a33; border-radius:9px; padding:11px 13px; font-size:13px; line-height:1.7; word-break:break-all; margin-bottom:14px; }
+    code { font-family:Consolas,monospace; color:#9ecbff; }
+    .player-shell { width:100%; aspect-ratio:16/9; min-height:320px; background:#000; border-radius:10px; overflow:hidden; }
+    #player { width:100%; height:100%; }
+    .log { margin-top:14px; background:#0b0d11; border:1px solid #20242c; border-radius:9px; padding:10px 12px; height:170px; overflow:auto; font:12px/1.5 Consolas,monospace; white-space:pre-wrap; }
+    .log .err{color:#f87171;} .log .ok{color:#86efac;} .log .mut{color:#6b7280;}
+    a { color:#9ecbff; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>PlayerJS VAST — RU, НОВАЯ кампания (НЕ воспроизводится)</h1>
+  <div class="badge">id:vast12219 — преролл НЕ показывается</div>
+
+  <div class="info">
+    <b>preroll:</b> <code>id:vast12219</code> (кампания «Dragon», GEO RU)<br>
+    <b>VAST-ссылка этой кампании:</b> <code>https://media-content.lbs.pw/vast?country=RU&amp;random=[random]</code><br>
+    <b>Контент (HLS):</b> <code>https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</code><br>
+    <b>Плеер:</b> наш продакшн-билд <code>playerjs.js</code> (Playerjs.com 22.0.6)
+  </div>
+
+  <div class="player-shell"><div id="player"></div></div>
+  <div class="log" id="log"></div>
+
+  <p style="font-size:13px;color:#8a8f98">
+    Рабочий пример с тем же контентом и тем же VAST, но СТАРЫМ id:
+    <a href="./ru-old-works.html">ru-old-works.html (id:vast12041)</a>.
+  </p>
+</div>
+
+<script src="./playerjs.js"></script>
+<script>
+  var PREROLL = "id:vast12219";
+  var FILE = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+
+  var logEl = document.getElementById('log');
+  function log(m, c){ var t=new Date().toISOString().substr(11,8); var d=document.createElement('div'); if(c)d.className=c; d.textContent='['+t+'] '+m; logEl.appendChild(d); logEl.scrollTop=logEl.scrollHeight; }
+
+  // PlayerJS зовёт этот глобал на все события (включая ошибки прероллов/VAST).
+  window.PlayerjsEvents = function(event, id, info){
+    var s='event='+event+(id!=null?' id='+id:'')+(info!=null?' info='+JSON.stringify(info):'');
+    log(s, event==='error' ? 'err' : 'mut');
+  };
+
+  log('preroll = '+PREROLL, 'ok');
+  log('PlayerJS: '+(window.Playerjs?'загружен':'НЕ загружен'), window.Playerjs?'ok':'err');
+  try { window.player = new Playerjs({ id:"player", file:FILE, preroll:PREROLL }); }
+  catch(e){ log('init error: '+e.message,'err'); }
+</script>
+</body>
+</html>

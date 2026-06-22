@@ -1,85 +1,59 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PlayerJS Test</title>
+  <title>PlayerJS VAST repro — RU, старый vs новый id</title>
   <style>
-    :root {
-      color-scheme: dark;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-    }
-
-    .page {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 24px 16px 40px;
-    }
-
-    .player-shell {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      min-height: 360px;
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-    }
-
-    #player {
-      width: 100%;
-      height: 100%;
-    }
-
-    .meta {
-      margin-top: 16px;
-      padding: 12px 14px;
-      background: #1b1b1b;
-      border: 1px solid #2b2b2b;
-      border-radius: 10px;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-
-    code {
-      font-family: Consolas, monospace;
-    }
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; background:#0f1115; color:#e8e8e8; }
+    .wrap { max-width:1200px; margin:0 auto; padding:20px 16px 50px; }
+    h1 { font-size:20px; margin:0 0 6px; }
+    p.lead { color:#c4c8d0; font-size:14px; line-height:1.6; margin:0 0 18px; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:760px){ .grid{ grid-template-columns:1fr; } }
+    .col { background:#161a21; border:1px solid #242a33; border-radius:11px; overflow:hidden; }
+    .col h2 { font-size:15px; margin:0; padding:11px 14px; }
+    .col.ok h2 { background:#14532d; color:#86efac; }
+    .col.bad h2 { background:#7c2d12; color:#fdba74; }
+    .col .meta { padding:8px 14px; font-size:12.5px; color:#aeb4bf; line-height:1.6; word-break:break-all; }
+    code { font-family:Consolas,monospace; color:#9ecbff; }
+    iframe { width:100%; height:430px; border:0; display:block; background:#000; }
+    .note { margin-top:20px; background:#0b0d11; border:1px solid #20242c; border-radius:9px; padding:12px 14px; font-size:13px; line-height:1.7; }
+    a { color:#9ecbff; }
   </style>
 </head>
 <body>
-  <main class="page">
-    <div class="player-shell">
-      <div id="player"></div>
+<div class="wrap">
+  <h1>PlayerJS VAST — одинаковый VAST, разный id кампании</h1>
+  <p class="lead">
+    Обе кампании указывают на <b>одну и ту же</b> VAST-ссылку
+    <code>https://media-content.lbs.pw/vast?country=RU&amp;random=[random]</code> и один контент.
+    Отличается только id кампании PlayerJS. <b>Старая кампания показывает преролл, новая — нет.</b>
+  </p>
+
+  <div class="grid">
+    <div class="col ok">
+      <h2>✅ Старый id:vast12041 (StakeRU2) — работает</h2>
+      <div class="meta">preroll: <code>id:vast12041</code></div>
+      <iframe src="./ru-old-works.html" title="old works"></iframe>
     </div>
-    <div class="meta">
-      Source: <code id="stream-url"></code>
+    <div class="col bad">
+      <h2>❌ Новый id:vast12219 (Dragon) — преролла нет</h2>
+      <div class="meta">preroll: <code>id:vast12219</code></div>
+      <iframe src="./ru-new-broken.html" title="new broken"></iframe>
     </div>
-  </main>
+  </div>
 
-  <script src="playerjs.js"></script>
-  <script>
-    (function () {
-      const defaultHlsUrl = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
-      const searchParams = new URLSearchParams(window.location.search);
-      const streamUrl = searchParams.get("src") || defaultHlsUrl;
-
-      document.getElementById("stream-url").textContent = streamUrl;
-
-      window.player = new Playerjs({
-        id: "player",
-        file: streamUrl
-      });
-    })();
-  </script>
+  <div class="note">
+    <b>Суть обращения в поддержку:</b> при идентичной VAST-ссылке и одном и том же плеере
+    новые кампании (созданные недавно) не отдают преролл, а старые отдают.
+    Просьба проверить на стороне PlayerJS статус/модерацию/ограничения новой кампании
+    <code>id:vast12219</code> по сравнению с рабочей <code>id:vast12041</code>.<br><br>
+    Отдельные страницы: <a href="./ru-old-works.html">ru-old-works.html</a> ·
+    <a href="./ru-new-broken.html">ru-new-broken.html</a>
+  </div>
+</div>
 </body>
 </html>
